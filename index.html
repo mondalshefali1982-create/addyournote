@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes & Expenses Mobile App</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body.light {
+    background: linear-gradient(to bottom, #89f7fe, #66a6ff);
+    color: #000;
+  }
+
+  body.dark {
+    background: #1e1e1e;
+    color: #fff;
+  }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+  }
+
+  header {
+    position: relative;
+    padding: 15px;
+    font-size: 22px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .mode-toggle {
+    position: absolute;
+    left: 10px;
+    top: 15px;
+  }
+
+  .mode-toggle button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #888;
+    color: white;
+  }
+
+  .top-buttons {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    display: flex;
+  }
+
+  .top-buttons button {
+    margin-left: 5px;
+    padding: 6px 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .light .top-buttons button {
+    background-color: #66a6ff;
+    color: white;
+  }
+
+  .light .top-buttons button.active {
+    background-color: #5591e6;
+  }
+
+  .dark .top-buttons button {
+    background-color: #555;
+    color: white;
+  }
+
+  .dark .top-buttons button.active {
+    background-color: #777;
+  }
+
+  .page {
+    flex: 1;
+    overflow-y: auto;
+    padding: 70px 20px 20px 20px; /* leave space for header and buttons */
+  }
+
+  .inputs input {
+    width: calc(100% - 22px);
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: 0.3s;
+  }
+
+  .light .add-btn { background-color: #66a6ff; color: white; }
+  .light .add-btn:hover { background-color: #5591e6; }
+
+  .dark .add-btn { background-color: #555; color: white; }
+  .dark .add-btn:hover { background-color: #777; }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    background: #f1f1f1;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    word-wrap: break-word;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body.dark li {
+    background: #444;
+    color: #fff;
+  }
+
+  li button {
+    margin-left: 5px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  li button.edit { background-color: #f0ad4e; color: white; }
+  li button.delete { background-color: #d9534f; color: white; }
+
+  .summary {
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+<body class="light">
+  <div class="app-container">
+    <header>
+      Notes & Expenses
+      <div class="mode-toggle">
+        <button onclick="toggleMode()">Mode</button>
+      </div>
+      <div class="top-buttons">
+        <button id="notesBtn" class="active" onclick="showPage('notes')">Notes</button>
+        <button id="expensesBtn" onclick="showPage('expenses')">Expenses</button>
+      </div>
+    </header>
+
+    <!-- Notes Page -->
+    <div class="page" id="notesPage">
+      <div class="inputs">
+        <input type="text" id="noteInput" placeholder="Enter your note">
+      </div>
+      <button class="add-btn" onclick="addNote()">Add Note</button>
+      <ul id="notesList"></ul>
+    </div>
+
+    <!-- Expenses Page -->
+    <div class="page" id="expensesPage" style="display:none;">
+      <div class="summary" id="totalExpense">Total Expenses: $0</div>
+      <div class="inputs">
+        <input type="text" id="expenseDesc" placeholder="Description">
+        <input type="number" id="expenseAmount" placeholder="Amount">
+      </div>
+      <button class="add-btn" onclick="addExpense()">Add Expense</button>
+      <ul id="expensesList"></ul>
+    </div>
+  </div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem('notes')) || [];
+let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+let mode = localStorage.getItem('mode') || 'light';
+
+const body = document.body;
+body.className = mode;
+
+const notesPage = document.getElementById('notesPage');
+const expensesPage = document.getElementById('expensesPage');
+const notesBtn = document.getElementById('notesBtn');
+const expensesBtn = document.getElementById('expensesBtn');
+const notesList = document.getElementById('notesList');
+const expensesList = document.getElementById('expensesList');
+const totalExpense = document.getElementById('totalExpense');
+
+function toggleMode() {
+  if(body.classList.contains('light')) { body.className='dark'; mode='dark'; }
+  else { body.className='light'; mode='light'; }
+  localStorage.setItem('mode', mode);
+}
+
+function showPage(page){
+  if(page==='notes'){
+    notesPage.style.display='block';
+    expensesPage.style.display='none';
+    notesBtn.classList.add('active');
+    expensesBtn.classList.remove('active');
+  } else {
+    notesPage.style.display='none';
+    expensesPage.style.display='block';
+    notesBtn.classList.remove('active');
+    expensesBtn.classList.add('active');
+  }
+}
+
+// Notes
+function displayNotes(){
+  notesList.innerHTML='';
+  notes.forEach((note,i)=>{
+    const li=document.createElement('li');
+    li.textContent=note;
+    const editBtn=document.createElement('button');
+    editBtn.textContent='Edit'; editBtn.className='edit';
+    editBtn.onclick=()=>editNote(i);
+    const delBtn=document.createElement('button');
+    delBtn.textContent='Delete'; delBtn.className='delete';
+    delBtn.onclick=()=>deleteNote(i);
+    li.appendChild(editBtn); li.appendChild(delBtn);
+    notesList.appendChild(li);
+  });
+}
+
+function addNote(){
+  const input=document.getElementById('noteInput');
+  if(input.value.trim()==='') return alert('Enter a note!');
+  notes.push(input.value); localStorage.setItem('notes',JSON.stringify(notes));
+  input.value=''; displayNotes();
+}
+
+function editNote(i){
+  const n=prompt('Edit note:',notes[i]);
+  if(n!==null && n.trim()!==''){ notes[i]=n; localStorage.setItem('notes',JSON.stringify(notes)); displayNotes(); }
+}
+
+function deleteNote(i){ notes.splice(i,1); localStorage.setItem('notes',JSON.stringify(notes)); displayNotes(); }
+
+// Expenses
+function displayExpenses(){
+  expensesList.innerHTML='';
+  let total=0;
+  expenses.forEach((e,i)=>{
+    total+=parseFloat(e.amount);
+    const li=document.createElement('li');
+    li.textContent=`${e.desc} - $${e.amount}`;
+    const editBtn=document.createElement('button');
+    editBtn.textContent='Edit'; editBtn.className='edit';
+    editBtn.onclick=()=>editExpense(i);
+    const delBtn=document.createElement('button');
+    delBtn.textContent='Delete'; delBtn.className='delete';
+    delBtn.onclick=()=>deleteExpense(i);
+    li.appendChild(editBtn); li.appendChild(delBtn);
+    expensesList.appendChild(li);
+  });
+  totalExpense.textContent=`Total Expenses: $${total}`;
+}
+
+function addExpense(){
+  const desc=document.getElementById('expenseDesc').value;
+  const amount=document.getElementById('expenseAmount').value;
+  if(desc.trim()==='' || amount.trim()==='') return alert('Enter description and amount!');
+  expenses.push({desc,amount}); localStorage.setItem('expenses',JSON.stringify(expenses));
+  document.getElementById('expenseDesc').value=''; document.getElementById('expenseAmount').value='';
+  displayExpenses();
+}
+
+function editExpense(i){
+  const d=prompt('Edit description:',expenses[i].desc);
+  const a=prompt('Edit amount:',expenses[i].amount);
+  if(d!==null && d.trim()!=='' && a!==null && !isNaN(a)){
+    expenses[i]={desc:d,amount:a};
+    localStorage.setItem('expenses',JSON.stringify(expenses));
+    displayExpenses();
+  }
+}
+
+function deleteExpense(i){ expenses.splice(i,1); localStorage.setItem('expenses',JSON.stringify(expenses)); displayExpenses(); }
+
+// Initial load
+displayNotes(); displayExpenses();
+</script>
+</body>
+</html>

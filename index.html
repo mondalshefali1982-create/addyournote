@@ -9,39 +9,99 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; height:100%; tra
 body.light { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color:#222; }
 body.dark { background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%); color:#fff; }
 
-header { position:fixed; top:0; left:0; width:100%; z-index:1000; background:transparent; padding-bottom:10px; }
-header .top-row { display:flex; justify-content:space-between; align-items:center; padding:10px 15px; }
-.mode-toggle button, .top-buttons button, .delete-all-btn { cursor:pointer; border:none; border-radius:8px; padding:6px 10px; font-size:14px; }
-.mode-toggle button { background:#888; color:#fff; }
-.light .top-buttons button { background:#66a6ff; color:#fff; }
-.light .top-buttons button.active { background:#5591e6; }
-.dark .top-buttons button { background:#555; color:#fff; }
-.dark .top-buttons button.active { background:#777; }
-.delete-all-btn { background:#d9534f; color:#fff; font-size:16px; padding:10px; }
-header .delete-row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+/* Top toolbar: modern mobile look */
+.top-row {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 12px 0;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.top-buttons button {
+  border:none;
+  border-radius:10px;
+  padding:10px 16px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+  background: rgba(102,166,255,0.8);
+  color:#fff;
+  transition: all 0.25s ease;
+}
+.top-buttons button.active {
+  background: rgba(86,145,230,0.9);
+  transform: scale(1.05);
+}
+.top-buttons button:hover {
+  background: rgba(86,145,230,0.85);
+  transform: scale(1.05);
+}
 
+/* Background buttons bottom-left: modern style */
+.bg-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.bg-buttons button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background: rgba(102,166,255,0.8);
+  color: #fff;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+.bg-buttons button:hover {
+  background: rgba(86,145,230,0.9);
+  transform: scale(1.05);
+}
+
+/* Pages */
 .app-container { display:flex; flex-direction:column; height:100vh; width:100%; position:relative; }
+.page { flex:1; overflow-y:auto; padding:120px 20px 20px 20px; transition: transform 0.3s ease; }
 
-.page { flex:1; overflow-y:auto; padding:180px 20px 20px 20px; transition: transform 0.3s ease; }
-
+/* Inputs & buttons */
 .inputs input, .inputs select { width:calc(100% - 22px); padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc; font-size:16px; }
+.add-btn { width:100%; padding:12px; border:none; border-radius:12px; font-size:16px; cursor:pointer; margin-bottom:15px; transition:0.3s; background:#66a6ff; color:#fff; }
+.add-btn:hover{ background:#5591e6; }
 
-.add-btn { width:100%; padding:12px; border:none; border-radius:12px; font-size:16px; cursor:pointer; margin-bottom:15px; transition:0.3s; }
-.light .add-btn{ background:#66a6ff; color:#fff; } .light .add-btn:hover{ background:#5591e6; }
-.dark .add-btn{ background:#555; color:#fff; } .dark .add-btn:hover{ background:#777; }
-
+/* List items */
 ul { list-style:none; padding:0; }
 li { background:#fff; padding:15px; margin-bottom:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; font-size:16px; word-wrap:break-word; box-shadow:0 4px 8px rgba(0,0,0,0.1); transition: all 0.3s; }
-li:hover { transform: translateY(-2px); box-shadow:0 6px 12px rgba(0,0,0,0.15); }
 body.dark li { background:#333; color:#fff; box-shadow:0 4px 8px rgba(0,0,0,0.3); }
 li button { margin-left:5px; padding:5px 8px; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
 li button.edit{ background:#f0ad4e; color:#fff; }
 li button.delete{ background:#d9534f; color:#fff; }
 
+/* Summary */
 .summary { font-weight:bold; margin-bottom:10px; font-size:16px; }
+
+/* Calendar button */
 #calendarBtn { position:fixed; bottom:20px; right:20px; background:#66a6ff; color:#fff; border:none; padding:15px; border-radius:50%; font-size:20px; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.3); transition:0.3s; }
 #calendarBtn:hover { background:#5591e6; }
 
+/* Calendar modal */
 #calendarModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
 #calendarContent { background:#fff; padding:20px; border-radius:12px; width:90%; max-width:400px; max-height:80%; overflow-y:auto; position:relative; }
 #calendarContent h2 { text-align:center; margin-top:0; }
@@ -50,27 +110,30 @@ body.dark #calendarContent { background:#333; color:#fff; }
 .monthBtn { display:block; width:100%; margin:5px 0; padding:10px; border:none; border-radius:8px; cursor:pointer; background:#66a6ff; color:white; font-size:16px; }
 body.dark .monthBtn { background:#555; color:white; }
 #backBtn { display:none;margin-top:10px;padding:10px;width:100%;border:none;border-radius:8px;background:#d9534f;color:white;cursor:pointer; }
+
 </style>
 </head>
 <body class="light">
 
 <div class="app-container" id="appContainer">
+
+<!-- Top bar -->
 <header>
   <div class="top-row">
-    <div class="mode-toggle"><button onclick="toggleMode()">Mode</button></div>
     <div class="top-buttons">
       <button id="notesBtn" class="active" onclick="showPage('notes')">Notes</button>
       <button id="expensesBtn" onclick="showPage('expenses')">Expenses</button>
-      <button onclick="chooseBackground()">Background</button>
-      <button onclick="resetBackground()">Reset BG</button>
-      <input type="file" id="bgInput" accept="image/*" style="display:none" onchange="setBackground(event)">
+      <button onclick="toggleMode()">Mode</button>
     </div>
   </div>
-  <div class="delete-row">
-    <button class="delete-all-btn" onclick="deleteAllNotes()">Delete All Notes</button>
-    <button class="delete-all-btn" onclick="deleteAllExpenses()">Delete All Expenses</button>
-  </div>
 </header>
+
+<!-- Background buttons bottom-left -->
+<div class="bg-buttons">
+  <button onclick="chooseBackground()">Background</button>
+  <button onclick="resetBackground()">Reset BG</button>
+  <input type="file" id="bgInput" accept="image/*" style="display:none" onchange="setBackground(event)">
+</div>
 
 <!-- Notes Page -->
 <div class="page" id="notesPage">
@@ -99,6 +162,7 @@ body.dark .monthBtn { background:#555; color:white; }
   <ul id="expensesList"></ul>
 </div>
 
+<!-- Calendar Button -->
 <button id="calendarBtn" onclick="openCalendar()">📅</button>
 
 <!-- Calendar Modal -->
@@ -151,14 +215,12 @@ function displayNotes(){ notesList.innerHTML=''; notes.forEach((n,i)=>{ const li
 function addNote(){ const n=document.getElementById('noteInput'); if(n.value.trim()==='') return alert('Enter a note!'); notes.push(n.value); localStorage.setItem('notes',JSON.stringify(notes)); n.value=''; displayNotes(); }
 function editNote(i){ const n=prompt('Edit note:',notes[i]); if(n!==null && n.trim()!==''){ notes[i]=n; localStorage.setItem('notes',JSON.stringify(notes)); displayNotes(); } }
 function deleteNote(i){ notes.splice(i,1); localStorage.setItem('notes',JSON.stringify(notes)); displayNotes(); }
-function deleteAllNotes(){ if(confirm('Are you sure you want to delete all notes?')){ notes=[]; localStorage.setItem('notes',JSON.stringify(notes)); displayNotes(); } }
 
 // Expenses
 function displayExpenses(monthFilter=null){ expensesList.innerHTML=''; let total=0; expenses.forEach((e,i)=>{ if(monthFilter && e.month!=monthFilter) return; total+=parseFloat(e.amount); const li=document.createElement('li'); li.textContent=`${e.desc} - $${e.amount} (Month:${e.month})`; const editBtn=document.createElement('button'); editBtn.textContent='Edit'; editBtn.className='edit'; editBtn.onclick=()=>editExpense(i); const delBtn=document.createElement('button'); delBtn.textContent='Delete'; delBtn.className='delete'; delBtn.onclick=()=>deleteExpense(i); li.appendChild(editBtn); li.appendChild(delBtn); expensesList.appendChild(li); }); totalExpense.textContent=`Total Expenses: $${total}`; }
 function addExpense(){ const desc=document.getElementById('expenseDesc').value; const amount=document.getElementById('expenseAmount').value; const month=document.getElementById('expenseMonth').value; if(desc.trim()==='' || amount.trim()==='' || month==='') return alert('Enter all fields!'); expenses.push({desc,amount,month}); localStorage.setItem('expenses',JSON.stringify(expenses)); document.getElementById('expenseDesc').value=''; document.getElementById('expenseAmount').value=''; document.getElementById('expenseMonth').value=''; displayExpenses(); }
 function editExpense(i){ const d=prompt('Edit description:',expenses[i].desc); const a=prompt('Edit amount:',expenses[i].amount); const m=prompt('Edit month:',expenses[i].month); if(d && a && m){ expenses[i]={desc:d,amount:a,month:m}; localStorage.setItem('expenses',JSON.stringify(expenses)); displayExpenses(); } }
 function deleteExpense(i){ expenses.splice(i,1); localStorage.setItem('expenses',JSON.stringify(expenses)); displayExpenses(); }
-function deleteAllExpenses(){ if(confirm('Are you sure you want to delete all expenses?')){ expenses=[]; localStorage.setItem('expenses',JSON.stringify(expenses)); displayExpenses(); } }
 
 // Calendar
 function openCalendar(){ showAllMonths(); calendarModal.style.display='flex'; }
@@ -184,5 +246,7 @@ window.addEventListener('load',()=>{ const bg = localStorage.getItem('customBack
 // Init
 displayNotes(); displayExpenses();
 </script>
+
 </body>
-</html>
+  </html>
+  
